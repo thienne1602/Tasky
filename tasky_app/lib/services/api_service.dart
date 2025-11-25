@@ -2,10 +2,12 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
+import '../config/api_config.dart';
+
 class ApiService {
   ApiService({http.Client? client, String? baseUrl})
       : _client = client ?? http.Client(),
-        _baseUrl = baseUrl ?? 'http://127.0.0.1:4000/api';
+        _baseUrl = baseUrl ?? ApiConfig.apiBaseUrl;
 
   final http.Client _client;
   final String _baseUrl;

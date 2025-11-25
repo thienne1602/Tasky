@@ -47,6 +47,48 @@ flutter run -d edge
 
 App sẽ mở trong Edge browser.
 
+### Phương pháp 3: Chạy trên Android Emulator (Android Studio)
+
+1. **Chuẩn bị công cụ**
+
+   - Cài Android Studio (Electric Eel trở lên) cùng Android SDK, Android Platform Tools và một system image x86_64 (ví dụ: Android 14).
+   - Bật virtualization (Intel VT-x/AMD-V) trong BIOS nếu chưa bật.
+   - Đảm bảo Flutter đã nhận ra Android SDK: `flutter doctor --android-licenses`.
+
+2. **Tạo & cài đặt máy ảo**
+
+   - Mở Android Studio → Device Manager → _Create device_ → chọn Pixel 6 (hoặc thiết bị bạn muốn).
+   - Chọn system image `Android 14 (UpsideDownCake) - x86_64` và tải nếu chưa có.
+   - Hoàn tất tạo AVD, sau đó bấm biểu tượng tam giác để khởi động emulator.
+
+3. **Chạy backend + database**
+
+   - Dùng `start_tasky.bat` hoặc chạy thủ công như phần trên để đảm bảo API chạy ở `http://localhost:4000`.
+
+4. **Chạy Flutter app trên emulator**
+
+   ```bash
+   cd tasky_app
+   flutter pub get
+   flutter devices          # chắc chắn emulator xuất hiện, ví dụ emulator-5554
+   flutter run -d emulator-5554
+   ```
+
+   > App sẽ tự dùng địa chỉ `http://10.0.2.2:4000` nên emulator có thể gọi API ở máy host mà không cần cấu hình thêm.
+
+5. **Tuỳ chọn: đổi API base URL**
+
+   - Khi cần trỏ tới server khác (ví dụ backend trên mạng LAN), dùng:
+     ```bash
+     flutter run --dart-define=TASKY_API_BASE=http://192.168.1.20:4000 -d emulator-5554
+     ```
+   - Với thiết bị vật lý Android, đảm bảo điện thoại và máy chủ cùng mạng và thay `10.0.2.2` bằng IP máy tính.
+
+6. **Troubleshooting nhanh**
+   - `SocketException` → kiểm tra backend còn chạy & firewall cho phép cổng 4000.
+   - `No supported devices connected` → mở `Android Emulator` hoặc cắm thiết bị, bật USB debugging, chạy `flutter doctor -v`.
+   - App không thấy ảnh đại diện → chắc chắn backend trả về đường dẫn hợp lệ, nếu là relative path app sẽ tự convert thành URL đầy đủ.
+
 ## 📁 Cấu trúc dự án
 
 ```

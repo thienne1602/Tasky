@@ -5,6 +5,7 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
+import '../../config/api_config.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/task_provider.dart';
 import '../../providers/theme_provider.dart';
@@ -696,7 +697,7 @@ class _ProfileViewState extends State<ProfileView>
   Future<String> _uploadAvatarToServer(
       File imageFile, AuthProvider auth) async {
     try {
-      final uri = Uri.parse('http://127.0.0.1:4000/api/users/me/avatar');
+      final uri = ApiConfig.apiUri('/users/me/avatar');
 
       final request = http.MultipartRequest('POST', uri);
       request.headers['Authorization'] = 'Bearer ${auth.token}';
@@ -716,7 +717,7 @@ class _ProfileViewState extends State<ProfileView>
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         // Return full URL
-        return 'http://127.0.0.1:4000${data['data']['avatarUrl']}';
+        return ApiConfig.resolveFileUrl(data['data']['avatarUrl'] as String);
       } else {
         throw Exception('Upload failed: ${response.body}');
       }
