@@ -2,14 +2,19 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../models/notification.dart';
 import '../services/api_service.dart';
+import '../services/audio_service.dart';
+import '../services/notification_service.dart';
 
 class NotificationProvider extends ChangeNotifier {
-  NotificationProvider({required ApiService api}) : _api = api;
+  NotificationProvider({required ApiService api}) : _api = api {
+    _initializeNotificationService();
+  }
 
   ApiService _api;
   final List<TaskyNotification> _notifications = [];
   bool _isLoading = false;
   Timer? _pollTimer;
+  final NotificationService _notificationService = NotificationService();
 
   List<TaskyNotification> get notifications =>
       List.unmodifiable(_notifications);
@@ -18,6 +23,42 @@ class NotificationProvider extends ChangeNotifier {
 
   void updateApi(ApiService api) {
     _api = api;
+  }
+
+  Future<void> _initializeNotificationService() async {
+    await _notificationService.initialize();
+  }
+
+  // Local notification settings getters
+  ReminderMode get reminderMode => _notificationService.reminderMode;
+  TimeOfDay get morningTime => _notificationService.morningTime;
+  TimeOfDay get eveningTime => _notificationService.eveningTime;
+  bool get notificationsEnabled => _notificationService.notificationsEnabled;
+
+  // Local notification settings setters
+  Future<void> setReminderMode(ReminderMode mode) async {
+    await _notificationService.setReminderMode(mode);
+    notifyListeners();
+  }
+
+  Future<void> setMorningTime(TimeOfDay time) async {
+    await _notificationService.setMorningTime(time);
+    notifyListeners();
+  }
+
+  Future<void> setEveningTime(TimeOfDay time) async {
+    await _notificationService.setEveningTime(time);
+    notifyListeners();
+  }
+
+  Future<void> setNotificationsEnabled(bool enabled) async {
+    await _notificationService.setNotificationsEnabled(enabled);
+    notifyListeners();
+  }
+
+  // Local notification methods
+  Future<bool> requestNotificationPermissions() async {
+    return await _notificationService.requestPermissions();
   }
 
   void startPolling() {
@@ -66,6 +107,11 @@ class NotificationProvider extends ChangeNotifier {
         ..addAll(newNotifications);
 
       notifyListeners();
+
+      // Play notification sound for new notifications
+      if (hasNewNotifications) {
+        AudioService().playNotificationSound();
+      }
 
       return;
     } catch (error) {

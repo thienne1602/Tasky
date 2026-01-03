@@ -138,8 +138,9 @@ class ActiveTasksBanner extends StatelessWidget {
               '+ ${activeTasks.length - 1} task khác đang chờ bạn 💪',
               style: TextStyle(
                 fontSize: 12,
-                color: TaskyPalette.midnight.withOpacity(0.7),
+                color: TaskyPalette.midnight.withOpacity(0.85),
                 fontStyle: FontStyle.italic,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ],

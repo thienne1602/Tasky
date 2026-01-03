@@ -1,2 +1,0 @@
-# Tasky Manager Configuration
-PROJECT_PATH=d:\project\Lập Trình Di Động\Tasky

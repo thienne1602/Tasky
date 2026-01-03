@@ -8,6 +8,7 @@ import '../../models/user.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/task_provider.dart';
 import '../../providers/team_provider.dart';
+import '../../services/audio_service.dart';
 import '../../theme/palette.dart';
 import '../../widgets/cute_widgets.dart';
 import '../../widgets/deadline_urgency_icon.dart';
@@ -172,8 +173,9 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
         _task = updatedTask;
       });
 
-      // Nếu task được đánh dấu hoàn thành, hiển thị popup đặc biệt
+      // Nếu task được đánh dấu hoàn thành, hiển thị popup đặc biệt và phát âm thanh
       if (task.status == 'done') {
+        AudioService().playTaskCompleteSound();
         FunNotification.taskComplete(context);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -766,8 +768,9 @@ class _MemberControlsState extends State<_MemberControls> {
       // Reload task detail
       await context.read<TaskProvider>().fetchTaskDetail(widget.task.id);
 
-      // Nếu task được đánh dấu hoàn thành, hiển thị popup đặc biệt
+      // Nếu task được đánh dấu hoàn thành, hiển thị popup đặc biệt và phát âm thanh
       if (_selectedStatus == 'done') {
+        AudioService().playTaskCompleteSound();
         FunNotification.taskComplete(context);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(

@@ -8,7 +8,8 @@
     "start": "node src/app.js",
     "dev": "nodemon src/app.js",
     "lint": "echo \"No lint configured\"",
-    "db:init": "node scripts/setupDatabase.js"
+    "db:init": "node scripts/setupDatabase.js",
+    "db:seed": "node scripts/seedData.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

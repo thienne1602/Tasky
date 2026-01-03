@@ -4,6 +4,8 @@ import 'package:intl/intl.dart';
 import '../models/comment.dart';
 import '../models/task.dart';
 import '../services/api_service.dart';
+import '../services/deadline_alert_service.dart';
+import '../services/notification_service.dart';
 
 class TaskProvider extends ChangeNotifier {
   TaskProvider({required ApiService api}) : _api = api;
@@ -13,6 +15,7 @@ class TaskProvider extends ChangeNotifier {
   bool _isLoading = false;
   String? _error;
   DateTime _selectedDay = DateTime.now();
+  final NotificationService _notificationService = NotificationService();
 
   List<Task> get tasks => List.unmodifiable(_tasks);
   bool get isLoading => _isLoading;
@@ -37,7 +40,9 @@ class TaskProvider extends ChangeNotifier {
   List<Task> get upcomingDeadlines => _tasks
       .where(
         (task) =>
-            task.deadline != null && task.deadline!.isAfter(DateTime.now()),
+            task.deadline != null &&
+            task.deadline!.isAfter(DateTime.now()) &&
+            task.status != 'done', // Chỉ hiển thị task chưa hoàn thành
       )
       .toList()
     ..sort((a, b) => a.deadline!.compareTo(b.deadline!));
@@ -75,6 +80,12 @@ class TaskProvider extends ChangeNotifier {
           data.map((item) => Task.fromJson(item as Map<String, dynamic>)),
         );
       _error = null;
+
+      // Start deadline monitoring
+      DeadlineAlertService().startMonitoring(_tasks);
+
+      // Schedule notifications for tasks
+      _scheduleNotificationsForTasks(_tasks);
     } catch (error) {
       _error = error.toString();
     } finally {
@@ -132,6 +143,7 @@ class TaskProvider extends ChangeNotifier {
 
   Future<void> updateTaskStatus(int taskId, String status) async {
     try {
+      final oldTask = _tasks.firstWhere((task) => task.id == taskId);
       await _api.put(
         '/tasks/$taskId',
         body: {
@@ -139,6 +151,12 @@ class TaskProvider extends ChangeNotifier {
         },
       );
       await fetchTasks();
+
+      // Show completion notification if task was completed
+      if (status == 'done' && oldTask.status != 'done') {
+        final updatedTask = _tasks.firstWhere((task) => task.id == taskId);
+        await _notificationService.showTaskCompletedNotification(updatedTask);
+      }
     } catch (error) {
       _error = error.toString();
       notifyListeners();
@@ -237,4 +255,19 @@ class TaskProvider extends ChangeNotifier {
 
   bool _isSameDay(DateTime a, DateTime b) =>
       a.year == b.year && a.month == b.month && a.day == b.day;
+
+  void _scheduleNotificationsForTasks(List<Task> tasks) {
+    for (final task in tasks) {
+      if (task.status != 'done') {
+        _notificationService.scheduleTaskReminder(task);
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    DeadlineAlertService().dispose();
+    _notificationService.cancelAllNotifications();
+    super.dispose();
+  }
 }

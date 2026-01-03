@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/palette.dart';
+import 'fun_gif_widget.dart';
 
 class CuteLoadingIndicator extends StatelessWidget {
   const CuteLoadingIndicator({
@@ -21,9 +22,11 @@ class CuteLoadingIndicator extends StatelessWidget {
             builder: (context, value, child) {
               return Transform.scale(
                 scale: 0.8 + (value * 0.2),
-                child: const Text(
-                  '🌸',
-                  style: TextStyle(fontSize: 48),
+                child: FunGifWidget(
+                  gifPath: 'assets/gifs/loading.gif',
+                  size: 80,
+                  borderRadius: 20,
+                  fallbackEmoji: '🌸',
                 ),
               );
             },

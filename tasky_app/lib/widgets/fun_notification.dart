@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/palette.dart';
+import 'fun_gif_widget.dart';
 
 class FunNotification {
   static void show(
@@ -75,6 +76,94 @@ class FunNotification {
     });
   }
 
+  static void _showWithGif(
+    BuildContext context, {
+    required String gifPath,
+    required String title,
+    required String message,
+    required String subtitle,
+    Color? color,
+    Duration duration = const Duration(seconds: 2),
+  }) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(28),
+            boxShadow: [
+              BoxShadow(
+                color: (color ?? TaskyPalette.mint).withOpacity(0.3),
+                blurRadius: 20,
+                spreadRadius: 5,
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TweenAnimationBuilder<double>(
+                tween: Tween(begin: 0.0, end: 1.0),
+                duration: const Duration(milliseconds: 800),
+                curve: Curves.elasticOut,
+                builder: (context, value, child) {
+                  return Transform.scale(
+                    scale: value,
+                    child: Transform.rotate(
+                      angle: (1 - value) * 0.5,
+                      child: FunGifWidget(
+                        gifPath: gifPath,
+                        size: 100,
+                        borderRadius: 25,
+                      ),
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(height: 16),
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                message,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: TaskyPalette.midnight.withOpacity(0.7),
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                subtitle,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: TaskyPalette.midnight.withOpacity(0.5),
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    Future.delayed(duration, () {
+      if (context.mounted) {
+        Navigator.of(context, rootNavigator: true).pop();
+      }
+    });
+  }
+
   static void success(
     BuildContext context, {
     required String title,
@@ -133,21 +222,22 @@ class FunNotification {
 
   static void taskComplete(BuildContext context) {
     final messages = [
-      ('Bạn giỏi quá! 🌟', '✨'),
-      ('Xuất sắc lắm! 💫', '🎯'),
-      ('Tuyệt vời! 🎊', '🎉'),
-      ('Làm được rồi! 🚀', '💪'),
-      ('Quá đỉnh! �', '👏'),
-      ('Cực kỳ tuyệt! 🌈', '🦄'),
-      ('Amazing! 🎪', '🎨'),
+      ('Bạn giỏi quá! 🌟', 'Hoàn thành rồi!'),
+      ('Xuất sắc lắm! 💫', 'Task done!'),
+      ('Tuyệt vời! 🎊', 'Amazing work!'),
+      ('Làm được rồi! 🚀', 'Great job!'),
+      ('Quá đỉnh! 🔥', 'Fantastic!'),
+      ('Cực kỳ tuyệt! 🌈', 'Excellent!'),
+      ('Amazing! 🎪', 'Outstanding!'),
     ];
     final randomMessage = (messages..shuffle()).first;
 
-    show(
+    _showWithGif(
       context,
-      emoji: randomMessage.$2,
+      gifPath: 'assets/gifs/done.gif',
       title: 'Hoàn thành task! 🌸',
       message: randomMessage.$1,
+      subtitle: randomMessage.$2,
       color: TaskyPalette.mint,
     );
   }

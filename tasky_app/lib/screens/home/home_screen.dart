@@ -8,6 +8,7 @@ import '../../providers/task_provider.dart';
 import '../../providers/team_provider.dart';
 import '../../theme/palette.dart';
 import '../profile/profile_view.dart';
+import '../statistics/statistics_screen.dart';
 import '../team/team_hub_view.dart';
 import '../tasks/create_task_sheet.dart';
 import '../tasks/task_detail_screen.dart';
@@ -23,7 +24,14 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  late final PageController _pageController = PageController();
   int _currentIndex = 0;
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -69,12 +77,26 @@ class _HomeScreenState extends State<HomeScreen> {
                         .textTheme
                         .bodySmall
                         ?.color
-                        ?.withOpacity(0.6),
+                        ?.withOpacity(0.8),
+                    fontWeight: FontWeight.w600,
                   ),
             ),
           ],
         ),
         actions: [
+          // Statistics button
+          IconButton(
+            icon: const Text('📊', style: TextStyle(fontSize: 20)),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const StatisticsScreen(),
+                ),
+              );
+            },
+          ),
+
           // Notification bell icon with badge
           Consumer<NotificationProvider>(
             builder: (context, notifProvider, _) {
@@ -150,13 +172,24 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(width: 16),
         ],
       ),
-      body: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 400),
-        child: tabs[_currentIndex],
+      body: PageView(
+        controller: _pageController,
+        physics: const BouncingScrollPhysics(),
+        onPageChanged: (index) {
+          setState(() => _currentIndex = index);
+        },
+        children: tabs,
       ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _currentIndex,
-        onDestinationSelected: (index) => setState(() => _currentIndex = index),
+        onDestinationSelected: (index) {
+          _pageController.animateToPage(
+            index,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+          );
+          setState(() => _currentIndex = index);
+        },
         destinations: const [
           NavigationDestination(
             icon: Text('🌈', style: TextStyle(fontSize: 20)),

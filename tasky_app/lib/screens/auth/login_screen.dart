@@ -157,23 +157,12 @@ class _LoginScreenState extends State<LoginScreen>
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          // Logo
+                          // Logo with GIF
                           Container(
-                            width: 100,
-                            height: 100,
+                            width: 120,
+                            height: 120,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              gradient: LinearGradient(
-                                colors: isDark
-                                    ? [
-                                        TaskyPalette.mint,
-                                        TaskyPalette.aqua,
-                                      ]
-                                    : [
-                                        TaskyPalette.lavender,
-                                        TaskyPalette.mint,
-                                      ],
-                              ),
                               boxShadow: [
                                 BoxShadow(
                                   color: (isDark
@@ -185,8 +174,33 @@ class _LoginScreenState extends State<LoginScreen>
                                 ),
                               ],
                             ),
-                            child: const Center(
-                              child: Text('✨', style: TextStyle(fontSize: 48)),
+                            child: ClipOval(
+                              child: Image.asset(
+                                'assets/gifs/login.gif',
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      gradient: LinearGradient(
+                                        colors: isDark
+                                            ? [
+                                                TaskyPalette.mint,
+                                                TaskyPalette.aqua,
+                                              ]
+                                            : [
+                                                TaskyPalette.lavender,
+                                                TaskyPalette.mint,
+                                              ],
+                                      ),
+                                    ),
+                                    child: const Center(
+                                      child: Text('✨',
+                                          style: TextStyle(fontSize: 48)),
+                                    ),
+                                  );
+                                },
+                              ),
                             ),
                           ),
                           const SizedBox(height: 32),

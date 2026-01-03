@@ -1,4 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
     <application
         android:label="tasky"
         android:name="${applicationName}"
@@ -30,7 +36,46 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+
+        <!-- Notification icon -->
+        <meta-data
+            android:name="com.dexterous.flutterlocalnotifications.NotificationIcon"
+            android:resource="@mipmap/ic_launcher" />
+
+        <!-- Notification default channel -->
+        <meta-data
+            android:name="com.dexterous.flutterlocalnotifications.default_notification_channel_id"
+            android:value="tasky_default_channel" />
+
+        <!-- Notification default channel name -->
+        <meta-data
+            android:name="com.dexterous.flutterlocalnotifications.default_notification_channel_name"
+            android:value="Tasky Notifications" />
+
+        <!-- Notification default channel description -->
+        <meta-data
+            android:name="com.dexterous.flutterlocalnotifications.default_notification_channel_description"
+            android:value="Thông báo từ ứng dụng Tasky" />
+
+        <!-- Boot receiver for scheduled notifications -->
+        <receiver android:name="com.dexterous.flutterlocalnotifications.BootReceiver"
+                  android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
+            </intent-filter>
+        </receiver>
+
+        <!-- Time zone receiver -->
+        <receiver android:name="com.dexterous.flutterlocalnotifications.TimeZoneReceiver"
+                  android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.TIMEZONE_CHANGED"/>
+            </intent-filter>
+        </receiver>
+
     </application>
+
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and
          https://developer.android.com/reference/android/content/Intent#ACTION_PROCESS_TEXT.

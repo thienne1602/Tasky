@@ -4,6 +4,7 @@ const userRoutes = require("./userRoutes");
 const teamRoutes = require("./teamRoutes");
 const taskRoutes = require("./taskRoutes");
 const notificationRoutes = require("./notificationRoutes");
+const statisticsRoutes = require("./statisticsRoutes");
 
 const router = express.Router();
 
@@ -12,5 +13,6 @@ router.use("/users", userRoutes);
 router.use("/teams", teamRoutes);
 router.use("/tasks", taskRoutes);
 router.use("/notifications", notificationRoutes);
+router.use("/statistics", statisticsRoutes);
 
 module.exports = router;
